@@ -3,7 +3,8 @@ import json
 import yaml
 import torch
 import tempfile
-import cv2
+import tifffile
+import PIL.Image
 from pathlib import Path
 from tqdm import tqdm
 from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
@@ -14,13 +15,18 @@ def load_config(config_path="ml/configs/data_pipeline.yaml"):
         return yaml.safe_load(f)
 
 def convert_tif_to_jpg(tif_path):
-    """Reads a tif image with cv2 and saves as a temp jpg, returning the new path."""
-    img = cv2.imread(str(tif_path))
-    if img is None:
-        raise ValueError(f"Failed to read {tif_path} with cv2")
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
-    cv2.imwrite(temp_file.name, img)
-    return temp_file.name
+    """Reads a tif image robustly and saves as a temp jpg, returning the new path."""
+    if not os.path.exists(tif_path):
+        raise FileNotFoundError(f"File does not exist: {tif_path}")
+        
+    try:
+        img_array = tifffile.imread(str(tif_path))
+        pil_img = PIL.Image.fromarray(img_array)
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
+        pil_img.save(temp_file.name)
+        return temp_file.name
+    except Exception as e:
+        raise ValueError(f"Failed to process {tif_path}: {e}")
 
 def run_baseline_inference():
     config = load_config()
