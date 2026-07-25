@@ -33,9 +33,19 @@ def run_baseline_inference():
         
     predictions = []
     
+    min_pixels = config['dataset'].get('min_pixels', 3136)
+    max_pixels = config['dataset'].get('max_pixels', 602112)
+    
     print(f"Running inference on {len(records)} test samples...")
     for i, record in enumerate(tqdm(records)):
         messages = record['messages'][0:1] # only use the user message prompt
+        
+        # Inject min/max pixels to prevent GPU hanging on huge images
+        for msg in messages:
+            for content in msg['content']:
+                if content['type'] == 'image':
+                    content['min_pixels'] = min_pixels
+                    content['max_pixels'] = max_pixels
         
         text_prompt = processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
