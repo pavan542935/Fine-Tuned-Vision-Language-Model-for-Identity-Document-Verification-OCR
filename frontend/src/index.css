@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #050505;
+  color: #ffffff;
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(255, 30, 30, 0.08), transparent 35%),
+    radial-gradient(circle at 85% 30%, rgba(255, 30, 30, 0.12), transparent 35%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}

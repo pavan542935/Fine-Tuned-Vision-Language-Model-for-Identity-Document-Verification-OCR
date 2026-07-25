@@ -1,0 +1,203 @@
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.header h1 {
+  font-size: 4rem;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.header h1 span {
+  color: #ff3333;
+  text-shadow: 0 0 20px rgba(255, 51, 51, 0.4);
+}
+
+.header p {
+  color: #888888;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+}
+
+.main-content {
+  display: flex;
+  gap: 3rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.panel {
+  flex: 1;
+  min-width: 320px;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  padding: 2.5rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-zone {
+  flex: 1;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  min-height: 300px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.upload-zone:hover {
+  border-color: #ff3333;
+  background: rgba(255, 51, 51, 0.05);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(255, 51, 51, 0.1);
+}
+
+.upload-zone.active {
+  border-color: #ff3333;
+  background: rgba(255, 51, 51, 0.15);
+  transform: scale(1.02);
+}
+
+.upload-icon {
+  width: 56px;
+  height: 56px;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.upload-zone:hover .upload-icon {
+  color: #ff3333;
+  opacity: 1;
+}
+
+.upload-zone p {
+  margin: 0;
+  color: #eeeeee;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.upload-zone span {
+  font-size: 0.9rem;
+  color: #777777;
+  margin-top: 0.5rem;
+}
+
+.preview-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 350px;
+  border-radius: 16px;
+  object-fit: contain;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Premium Glassmorphism Button */
+.glass-btn {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.glass-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.glass-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.glass-btn.primary {
+  background: rgba(255, 51, 51, 0.15);
+  border-color: rgba(255, 51, 51, 0.4);
+  color: #ffcccc;
+}
+
+.glass-btn.primary:hover:not(:disabled) {
+  background: rgba(255, 51, 51, 0.3);
+  border-color: rgba(255, 51, 51, 0.8);
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(255, 51, 51, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.results-pre {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2rem;
+  border-radius: 20px;
+  overflow-x: auto;
+  color: #e2e8f0;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex: 1;
+  box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.loader {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top: 3px solid #ff3333;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
