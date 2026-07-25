@@ -19,8 +19,8 @@ Evaluate the LoRA fine-tuned model on the hold-out test set and compare its perf
 ## Task Checklist
 - [x] Write `inference_lora.py` that merges the base model with our newly trained PEFT adapter.
 - [x] Update `scorer.py` to output a comparative markdown table side-by-side.
-- [ ] You (the user) run `inference_lora.py`.
-- [ ] You (the user) run `scorer.py` and report the final leap in accuracy.
+- [x] You (the user) run `inference_lora.py`.
+- [x] You (the user) run `scorer.py` and report the final leap in accuracy.
 
 ## Manual Steps Required From Me
 1. Pull the latest code and run the LoRA inference script on the test set:
