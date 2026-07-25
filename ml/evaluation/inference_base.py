@@ -2,6 +2,8 @@ import os
 import json
 import yaml
 import torch
+import tempfile
+import cv2
 from pathlib import Path
 from tqdm import tqdm
 from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
@@ -10,6 +12,15 @@ from qwen_vl_utils import process_vision_info
 def load_config(config_path="ml/configs/data_pipeline.yaml"):
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
+
+def convert_tif_to_jpg(tif_path):
+    """Reads a tif image with cv2 and saves as a temp jpg, returning the new path."""
+    img = cv2.imread(str(tif_path))
+    if img is None:
+        raise ValueError(f"Failed to read {tif_path} with cv2")
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
+    cv2.imwrite(temp_file.name, img)
+    return temp_file.name
 
 def run_baseline_inference():
     config = load_config()
@@ -45,9 +56,16 @@ def run_baseline_inference():
         messages = record['messages'][0:1] # only use the user message prompt
         
         # Inject min/max pixels to prevent GPU hanging on huge images
+        temp_files = []
         for msg in messages:
             for content in msg['content']:
                 if content['type'] == 'image':
+                    img_path = content['image']
+                    if str(img_path).lower().endswith(('.tif', '.tiff')):
+                        new_path = convert_tif_to_jpg(img_path)
+                        content['image'] = new_path
+                        temp_files.append(new_path)
+                        
                     content['min_pixels'] = min_pixels
                     content['max_pixels'] = max_pixels
         
@@ -81,6 +99,11 @@ def run_baseline_inference():
             "raw_output": output_text,
             "ground_truth": json.loads(record['messages'][1]['content'][0]['text'])
         })
+        
+        # Clean up temporary jpgs
+        for tf in temp_files:
+            if os.path.exists(tf):
+                os.remove(tf)
         
     out_path = Path("ml/evaluation/baseline_predictions.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
