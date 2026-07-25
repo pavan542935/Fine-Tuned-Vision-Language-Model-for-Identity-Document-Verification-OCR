@@ -19,7 +19,7 @@ Deploy our newly fine-tuned model into a beautiful, interactive web interface us
 ## Task Checklist
 - [x] Write `ui/app.py` utilizing `gradio` and embedding the LoRA weights.
 - [x] Apply modern UI styling and CSS.
-- [ ] You (the user) run `app.py` on Colab to get the public link!
+- [x] You (the user) run `app.py` on Colab to get the public link!
 
 ## Manual Steps Required From Me
 This is the final test! Let's boot up the web app directly from Colab.
