@@ -97,7 +97,14 @@ class Qwen2VLDataset(Dataset):
         labels[0, :prompt_len] = -100
         
         inputs['labels'] = labels
-        return {k: v.squeeze(0) for k, v in inputs.items()}
+        
+        out = {}
+        for k, v in inputs.items():
+            if k in ['pixel_values', 'image_grid_thw']:
+                out[k] = v
+            else:
+                out[k] = v.squeeze(0)
+        return out
 
 def custom_collator(features, processor):
     batch = {}
