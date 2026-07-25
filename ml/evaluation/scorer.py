@@ -24,53 +24,71 @@ def fuzzy_match_score(str1, str2):
     return difflib.SequenceMatcher(None, str(str1).lower(), str(str2).lower()).ratio()
 
 def score_predictions():
-    pred_file = Path("ml/evaluation/baseline_predictions.json")
-    if not pred_file.exists():
-        raise FileNotFoundError(f"{pred_file} not found. Run inference_base.py first.")
-        
-    with open(pred_file, "r", encoding="utf-8") as f:
-        predictions = json.load(f)
-        
-    fields = ["Name", "DOB", "ID Number", "Address"]
+    base_file = Path("ml/evaluation/baseline_predictions.json")
+    lora_file = Path("ml/evaluation/lora_predictions.json")
     
-    metrics = {f: {"exact": 0, "fuzzy_sum": 0.0} for f in fields}
-    parse_failures = 0
-    total = len(predictions)
-    
-    for p in predictions:
-        gt = p["ground_truth"]
-        raw_out = p["raw_output"]
+    def evaluate_file(pred_file):
+        if not pred_file.exists():
+            return None
+        with open(pred_file, "r", encoding="utf-8") as f:
+            predictions = json.load(f)
+            
+        fields = ["Name", "DOB", "ID Number", "Address"]
+        metrics = {f: {"exact": 0, "fuzzy_sum": 0.0} for f in fields}
+        parse_failures = 0
+        total = len(predictions)
         
-        pred_json = extract_json_from_text(raw_out)
-        if pred_json is None:
-            parse_failures += 1
-            pred_json = {} # count all fields as missed
+        for p in predictions:
+            gt = p["ground_truth"]
+            raw_out = p["raw_output"]
             
-        for f in fields:
-            gt_val = gt.get(f, "")
-            pred_val = pred_json.get(f, "")
-            
-            # Exact
-            if str(gt_val).strip() == str(pred_val).strip():
-                metrics[f]["exact"] += 1
+            pred_json = extract_json_from_text(raw_out)
+            if pred_json is None:
+                parse_failures += 1
+                pred_json = {} # count all fields as missed
                 
-            # Fuzzy
-            metrics[f]["fuzzy_sum"] += fuzzy_match_score(gt_val, pred_val)
-            
-    # Compile report
-    report = f"# Baseline Evaluation Report\n\n"
-    report += f"Total Samples: {total}\n"
-    report += f"Parse Failures (Raw output wasn't valid JSON): {parse_failures} / {total} ({(parse_failures/total)*100:.1f}%)\n\n"
+            for f in fields:
+                gt_val = gt.get(f, "")
+                pred_val = pred_json.get(f, "")
+                
+                # Exact
+                if str(gt_val).strip() == str(pred_val).strip():
+                    metrics[f]["exact"] += 1
+                    
+                # Fuzzy
+                metrics[f]["fuzzy_sum"] += fuzzy_match_score(gt_val, pred_val)
+        return total, parse_failures, metrics, fields
+
+    base_results = evaluate_file(base_file)
+    lora_results = evaluate_file(lora_file)
     
-    report += "| Field | Exact Match Accuracy | Fuzzy Match Score (Avg) |\n"
-    report += "|-------|----------------------|-------------------------|\n"
+    report = f"# Final Evaluation Report\n\n"
     
-    for f in fields:
-        exact_acc = (metrics[f]["exact"] / total) * 100
-        fuzzy_avg = (metrics[f]["fuzzy_sum"] / total) * 100
-        report += f"| {f} | {exact_acc:.1f}% | {fuzzy_avg:.1f}% |\n"
+    if base_results:
+        total, parse_failures, metrics, fields = base_results
+        report += f"## Baseline Model (No Fine-Tuning)\n"
+        report += f"Total Samples: {total}\nParse Failures: {parse_failures} / {total} ({(parse_failures/total)*100:.1f}%)\n\n"
+        report += "| Field | Exact Match Accuracy | Fuzzy Match Score (Avg) |\n"
+        report += "|-------|----------------------|-------------------------|\n"
+        for f in fields:
+            exact_acc = (metrics[f]["exact"] / total) * 100
+            fuzzy_avg = (metrics[f]["fuzzy_sum"] / total) * 100
+            report += f"| {f} | {exact_acc:.1f}% | {fuzzy_avg:.1f}% |\n"
+        report += "\n"
         
-    report_path = Path("ml/evaluation/baseline_report.md")
+    if lora_results:
+        total, parse_failures, metrics, fields = lora_results
+        report += f"## LoRA Fine-Tuned Model\n"
+        report += f"Total Samples: {total}\nParse Failures: {parse_failures} / {total} ({(parse_failures/total)*100:.1f}%)\n\n"
+        report += "| Field | Exact Match Accuracy | Fuzzy Match Score (Avg) |\n"
+        report += "|-------|----------------------|-------------------------|\n"
+        for f in fields:
+            exact_acc = (metrics[f]["exact"] / total) * 100
+            fuzzy_avg = (metrics[f]["fuzzy_sum"] / total) * 100
+            report += f"| {f} | {exact_acc:.1f}% | {fuzzy_avg:.1f}% |\n"
+        report += "\n"
+        
+    report_path = Path("ml/evaluation/final_report.md")
     report_path.parent.mkdir(parents=True, exist_ok=True)
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report)

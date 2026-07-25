@@ -21,7 +21,7 @@ Fine-tune the Qwen2-VL-2B model using QLoRA (4-bit quantization + LoRA adapters)
 ## Task Checklist
 - [x] Write `train_config.yaml` with optimal LoRA hyperparameters (rank 16).
 - [x] Write `train.py` including dataset processing, token masking, and 4-bit QLoRA setup.
-- [ ] You (the user) run `train.py` on the Colab GPU.
+- [x] You (the user) run `train.py` on the Colab GPU.
 
 ## Dependencies
 - Sprint 03 complete (Train/val splits exist).
