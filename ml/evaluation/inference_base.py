@@ -22,9 +22,12 @@ def run_baseline_inference():
     print("Loading model and processor...")
     model_id = "Qwen/Qwen2-VL-2B-Instruct"
     
-    # Load in bfloat16 to fit nicely in 16GB T4 VRAM without quantization for baseline
+    # Use device_map="cuda" instead of "auto" to prevent silent CPU offloading (which takes hours)
+    # If it doesn't fit, this will properly throw an OutOfMemory error instead of hanging.
     model = Qwen2VLForConditionalGeneration.from_pretrained(
-        model_id, torch_dtype=torch.bfloat16, device_map="auto"
+        model_id, 
+        torch_dtype=torch.bfloat16, 
+        device_map="cuda",
     )
     processor = AutoProcessor.from_pretrained(model_id)
     
@@ -33,11 +36,12 @@ def run_baseline_inference():
         
     predictions = []
     
-    min_pixels = config['dataset'].get('min_pixels', 3136)
-    max_pixels = config['dataset'].get('max_pixels', 602112)
+    # Enforce small image resolution to prevent memory blowups
+    min_pixels = 3136
+    max_pixels = 250880 # 224 * 224 * 5 = much smaller footprint to guarantee it runs
     
     print(f"Running inference on {len(records)} test samples...")
-    for i, record in enumerate(tqdm(records)):
+    for i, record in enumerate(tqdm(records, ascii=True)):
         messages = record['messages'][0:1] # only use the user message prompt
         
         # Inject min/max pixels to prevent GPU hanging on huge images
