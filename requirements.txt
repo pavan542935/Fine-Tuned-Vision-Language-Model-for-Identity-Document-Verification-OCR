@@ -1,0 +1,20 @@
+# Pinned versions known to support Qwen2-VL-2B-Instruct and QLoRA on Colab (CUDA 12.x)
+torch==2.4.1
+torchvision==0.19.1
+transformers==4.45.0
+peft==0.13.0
+accelerate==0.34.2
+bitsandbytes==0.44.1
+albumentations==1.4.17
+qwen-vl-utils==0.0.8
+fastapi==0.115.0
+uvicorn==0.31.0
+python-multipart==0.0.12
+pydantic==2.9.2
+pyyaml==6.0.2
+pillow==10.4.0
+scikit-learn==1.5.2
+matplotlib==3.9.2
+numpy==1.26.4
+tqdm==4.66.5
+# Optional: flash-attn (install manually if on supported GPU, e.g., A100/H100/L4, T4 doesn't support flash-attn 2 well but sometimes it works with specific builds. We will note this in AGENTS.md)

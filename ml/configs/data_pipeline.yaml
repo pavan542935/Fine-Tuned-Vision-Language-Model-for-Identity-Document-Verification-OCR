@@ -1,0 +1,28 @@
+dataset:
+  name: "MIDV-500"
+  path: "/content/drive/MyDrive/idvlm/data/midv500_data"  # Path on Colab
+  output_dir: "/content/drive/MyDrive/idvlm/data/processed"
+  
+  # Qwen2-VL Dynamic Resolution settings
+  # These are crucial to prevent OOM on T4 (16GB VRAM)
+  # Default max_pixels is very large, restricting it here.
+  min_pixels: 3136        # 56 * 56
+  max_pixels: 602112      # e.g., 768 * 784, keeps memory footprint reasonable
+  
+  # Curated subset size. Set to a lower number if you want to train on a smaller subset due to space limits.
+  # 500-1000 is usually enough for a solid LoRA fine-tune.
+  max_samples: 1000       
+
+  split:
+    train_ratio: 0.8
+    val_ratio: 0.1
+    test_ratio: 0.1
+    seed: 42
+
+fields_to_extract:
+  - "Name"
+  - "DOB"
+  - "ID Number"
+  - "Address"
+
+instruction_prompt: "Extract the following fields from this identity document as a JSON object: Name, DOB, ID Number, Address. If a field is not visible, output null for that field."
