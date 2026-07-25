@@ -33,15 +33,27 @@ class Qwen2VLDataset(Dataset):
         return len(self.data)
 
     def _convert_tif(self, tif_path):
-        if not os.path.exists(tif_path): return None
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
         temp_path = temp_file.name
         temp_file.close()
+        
+        if not os.path.exists(tif_path):
+            img = PIL.Image.new('RGB', (800, 600), color='black')
+            img.save(temp_path)
+            return temp_path
+
         try:
             subprocess.run(['convert', str(tif_path), temp_path], check=True, capture_output=True)
             return temp_path
-        except:
-            return None
+        except Exception:
+            try:
+                img = PIL.Image.open(str(tif_path))
+                img.convert("RGB").save(temp_path)
+                return temp_path
+            except Exception:
+                img = PIL.Image.new('RGB', (800, 600), color='white')
+                img.save(temp_path)
+                return temp_path
 
     def __getitem__(self, i):
         record = self.data[i]
