@@ -47,18 +47,23 @@ function App() {
 
     setLoading(true);
     setError(null);
-    
+
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:8000/api/extract', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://curly-cows-decide.loca.lt';
+      const response = await fetch(`${apiUrl}/api/extract`, {
         method: 'POST',
+        headers: {
+          'Bypass-Tunnel-Reminder': 'true'
+        },
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
+        const errData = await response.json().catch(() => null);
+        throw new Error(errData?.detail || `Server error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -92,9 +97,9 @@ function App() {
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: 0, fontWeight: 600, letterSpacing: '-0.5px' }}>
             <FileText size={26} color="#ffffff" opacity={0.8} /> Document Upload
           </h2>
-          
+
           {!file ? (
-            <div 
+            <div
               className="upload-zone"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -104,18 +109,18 @@ function App() {
               <UploadCloud className="upload-icon" />
               <p>Drag & drop your ID card here</p>
               <span>or click to browse files</span>
-              <input 
-                type="file" 
+              <input
+                type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 accept="image/*"
-                style={{ display: 'none' }} 
+                style={{ display: 'none' }}
               />
             </div>
           ) : (
             <div className="preview-container">
               <img src={preview} alt="Document preview" className="image-preview" />
-              
+
               <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
                 <button className="glass-btn" onClick={clearSelection} disabled={loading}>
                   Clear Selection
@@ -140,7 +145,7 @@ function App() {
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: 0, fontWeight: 600, letterSpacing: '-0.5px' }}>
             <CheckCircle size={26} color={result ? "#ff3333" : "#ffffff"} opacity={result ? 1 : 0.8} /> Extraction Results
           </h2>
-          
+
           {error && (
             <div style={{ color: '#ffcccc', background: 'rgba(255, 51, 51, 0.1)', border: '1px solid rgba(255, 51, 51, 0.2)', padding: '1rem', borderRadius: '12px', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
               <AlertCircle size={22} /> {error}
